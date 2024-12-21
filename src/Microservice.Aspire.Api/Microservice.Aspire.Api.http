@@ -1,0 +1,6 @@
+@Microservice.Aspire.Api_HostAddress = http://localhost:5014
+
+GET {{Microservice.Aspire.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
