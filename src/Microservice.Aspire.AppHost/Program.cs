@@ -6,6 +6,8 @@ var sql = builder
     .AddSqlServer("sql", port: 58349, password: sqlPass)
     .WithLifetime(ContainerLifetime.Persistent);
 
+var configFile = Path.Combine(Directory.GetCurrentDirectory(), "Config.json");
+
 var messageBus = builder
     .AddContainer("servicebus", "mcr.microsoft.com/azure-messaging/servicebus-emulator")
     .WithReference(sql.Resource.PrimaryEndpoint)
@@ -13,8 +15,10 @@ var messageBus = builder
     .WithEnvironment("ACCEPT_EULA", "Y")
     .WithEnvironment("SQL_SERVER", "sql")
     .WithEnvironment("MSSQL_SA_PASSWORD", "Password123!")
-    .WithBindMount("", "/ServiceBus-Emulator/ConfigFiles/Config.json")
+    .WithBindMount(configFile, "/ServiceBus_Emulator/ConfigFiles/Config.json")
     .WaitFor(sql);
+
+var messageBusEndpoint = messageBus.GetEndpoint("servicebus");
 
 var redis = builder
     .AddRedis("cache")
@@ -22,8 +26,10 @@ var redis = builder
     .WithRedisInsight();
 
 builder
-    .AddProject<Projects.Microservice_Aspire_Api>("microservice-aspire-api")
+    .AddProject<Projects.Microservice_Aspire_Api>("api")
     .WithReference(redis)
-    .WaitFor(redis);
+    .WaitFor(redis)
+    .WithReference(messageBusEndpoint)
+    .WaitFor(messageBus);
 
 builder.Build().Run();
