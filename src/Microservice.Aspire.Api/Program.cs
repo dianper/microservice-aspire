@@ -9,19 +9,26 @@ namespace Microservice.Aspire.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.AddServiceDefaults();
 
             var configuration = builder.Configuration;
 
-            var serviceBusConnectionString = configuration.GetConnectionString("serviceBus");
+            builder.AddServiceDefaults();
 
             // Add services to the container.
+            
+            // Cache
             builder.AddRedisClient("cache");
 
-            builder.Services.AddAzureClients(azureClientFactoryBuilder =>
+            // ServiceBus
+            builder.AddAzureServiceBusClient("servicebus", settings =>
             {
-                azureClientFactoryBuilder.AddServiceBusClient(serviceBusConnectionString);
+                settings.ConnectionString = configuration.GetConnectionString("serviceBus");
             });
+
+            // Storage
+            builder.AddAzureBlobClient("blobs");
+
+            builder.Services.AddProblemDetails();
 
             // Versioning
             builder.Services.AddApiVersioning(options =>

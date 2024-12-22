@@ -1,11 +1,13 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
+// Sql Server
 var sqlPass = builder.AddParameter("password", "Password123!");
 
 var sql = builder
     .AddSqlServer("sql", port: 58349, password: sqlPass)
     .WithLifetime(ContainerLifetime.Persistent);
 
+// Azure ServiceBus (Emulator)
 var configFile = Path.Combine(Directory.GetCurrentDirectory(), "Config.json");
 
 var messageBus = builder
@@ -20,16 +22,33 @@ var messageBus = builder
 
 var messageBusEndpoint = messageBus.GetEndpoint("servicebus");
 
+// Redis Cache
 var redis = builder
     .AddRedis("cache")
     .WithLifetime(ContainerLifetime.Persistent)
     .WithRedisInsight();
 
+// Azure Storage (Emulator)
+var storage = builder
+    .AddAzureStorage("storage")
+    .RunAsEmulator(azurite =>
+    {
+        azurite
+            .WithBlobPort(27000)
+            .WithQueuePort(27001)
+            .WithTablePort(27002)
+            .WithDataVolume();
+    })
+    .AddBlobs("blobs");
+
+// Api
 builder
     .AddProject<Projects.Microservice_Aspire_Api>("api")
     .WithReference(redis)
     .WaitFor(redis)
     .WithReference(messageBusEndpoint)
-    .WaitFor(messageBus);
+    .WaitFor(messageBus)
+    .WithReference(storage)
+    .WaitFor(storage);
 
 builder.Build().Run();

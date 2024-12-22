@@ -9,6 +9,8 @@
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+    <PackageReference Include="Aspire.Azure.Messaging.ServiceBus" Version="9.0.0" />
+    <PackageReference Include="Aspire.Azure.Storage.Blobs" Version="9.0.0" />
     <PackageReference Include="Aspire.StackExchange.Redis" Version="9.0.0" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.2" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.9.0" />

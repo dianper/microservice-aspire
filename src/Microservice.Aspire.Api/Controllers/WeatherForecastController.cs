@@ -1,7 +1,9 @@
 using Asp.Versioning;
 using Azure.Messaging.ServiceBus;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
+using System.Text;
 using System.Text.Json;
 
 namespace Microservice.Aspire.Api.Controllers
@@ -16,20 +18,21 @@ namespace Microservice.Aspire.Api.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        private readonly IConnectionMultiplexer _connectionMultiplexer;
         private readonly IDatabase _database;
         private readonly ILogger<WeatherForecastController> _logger;
         private readonly ServiceBusClient _busClient;
+        private readonly BlobServiceClient _blobServiceClient;
 
         public WeatherForecastController(
             IConnectionMultiplexer connectionMultiplexer,
             ILogger<WeatherForecastController> logger,
-            ServiceBusClient busClient)
+            ServiceBusClient busClient,
+            BlobServiceClient blobClient)
         {
-            _connectionMultiplexer = connectionMultiplexer;
             _database = connectionMultiplexer.GetDatabase();
             _logger = logger;
             _busClient = busClient;
+            _blobServiceClient = blobClient;
         }
 
         [HttpGet("get")]
@@ -91,6 +94,32 @@ namespace Microservice.Aspire.Api.Controllers
             }
 
             return Ok(messages);
+        }
+
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadFileAsync()
+        {
+            var blobContainerClient = _blobServiceClient
+                .GetBlobContainerClient("files");
+
+            await blobContainerClient
+                .CreateIfNotExistsAsync();
+
+            var blobClient = blobContainerClient
+                .GetBlobClient("weather.json");
+
+            var weatherForecast = new WeatherForecast
+            {
+                Date = DateOnly.FromDateTime(DateTime.Now),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+            };
+
+            var json = JsonSerializer.Serialize(weatherForecast);
+
+            await blobClient.UploadAsync(new MemoryStream(Encoding.UTF8.GetBytes(json)), overwrite: true);
+
+            return Ok();
         }
     }
 }
