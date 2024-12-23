@@ -1,3 +1,5 @@
+using Aspire.Hosting;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 // Sql Server
@@ -41,6 +43,14 @@ var storage = builder
     })
     .AddBlobs("blobs");
 
+// MongoDB
+var mongo = builder
+    .AddMongoDB("mongo", 27017)
+    .WithMongoExpress()
+    .WithLifetime(ContainerLifetime.Persistent);
+
+var mongodb = mongo.AddDatabase("filedb");
+
 // Api
 builder
     .AddProject<Projects.Microservice_Aspire_Api>("api")
@@ -49,6 +59,8 @@ builder
     .WithReference(messageBusEndpoint)
     .WaitFor(messageBus)
     .WithReference(storage)
-    .WaitFor(storage);
+    .WaitFor(storage)
+    .WithReference(mongodb)
+    .WaitFor(mongodb);
 
 builder.Build().Run();
