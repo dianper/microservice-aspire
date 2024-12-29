@@ -1,8 +1,8 @@
-﻿using Asp.Versioning;
-using Microservice.Aspire.Api.Services;
-
-namespace Microservice.Aspire.Api
+﻿namespace Microservice.Aspire.Api
 {
+    using Asp.Versioning;
+    using Microservice.Aspire.Api.Services;
+
     public static class ProgramExtensions
     {
         public static IHostApplicationBuilder AddApplicationDependencies(this IHostApplicationBuilder builder, IConfiguration configuration)
@@ -20,7 +20,7 @@ namespace Microservice.Aspire.Api
             });
 
             // MongoDB
-            builder.AddMongoDBClient("filedb", settings =>
+            builder.AddMongoDBClient("mongodb", settings =>
             {
                 settings.ConnectionString = configuration.GetConnectionString("mongo");
             });
@@ -36,7 +36,9 @@ namespace Microservice.Aspire.Api
             // Services
             builder.Services
                 .AddAzureBlobStorageService()
-                .AddAzureServiceBusService();
+                .AddAzureServiceBusService()
+                .AddCsvReaderService()
+                .AddMongoDbService();
 
             // Problem Details
             builder.Services.AddProblemDetails();

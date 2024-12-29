@@ -4,7 +4,7 @@
     {
         public static IServiceCollection AddBackgroundService(this IServiceCollection services)
         {
-            services.AddHostedService<MessageProcessingService>();
+            services.AddHostedService<CovidFileProcessingService>();
             return services;
         }
     }

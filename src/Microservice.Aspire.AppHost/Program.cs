@@ -1,5 +1,3 @@
-using Aspire.Hosting;
-
 var builder = DistributedApplication.CreateBuilder(args);
 
 // Sql Server
@@ -44,12 +42,16 @@ var storage = builder
     .AddBlobs("blobs");
 
 // MongoDB
-var mongo = builder
-    .AddMongoDB("mongo", 27017)
-    .WithMongoExpress()
-    .WithLifetime(ContainerLifetime.Persistent);
+var mongoUser = builder.AddParameter("mongo-user", "user1");
+var mongoPass = builder.AddParameter("mongo-password", "123456", secret: true);
 
-var mongodb = mongo.AddDatabase("filedb");
+var mongo = builder
+    .AddMongoDB("mongo", 27017, mongoUser, mongoPass)
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithMongoExpress();
+
+var mongodb = mongo
+    .AddDatabase("mongodb");
 
 // Api
 builder

@@ -1,30 +1,44 @@
-﻿using Azure.Messaging.ServiceBus;
+﻿namespace Microservice.Aspire.Api.Services;
+
+using Azure.Messaging.ServiceBus;
 using System.Text.Json;
 
-namespace Microservice.Aspire.Api.Services
+public class AzureServiceBusService(ServiceBusClient serviceBusClient)
 {
-    public class AzureServiceBusService
+    private readonly ServiceBusClient _serviceBusClient = serviceBusClient;
+
+    public ServiceBusReceiver CreateReceiver(string queueName)
     {
-        private readonly ServiceBusClient _serviceBusClient;
+        return _serviceBusClient.CreateReceiver(queueName);
+    }
 
-        public AzureServiceBusService(ServiceBusClient serviceBusClient)
+    public async Task CompleteMessageAsync(ServiceBusReceiver receiver, ServiceBusReceivedMessage message)
+    {
+        await receiver.CompleteMessageAsync(message);
+    }
+
+    public async Task DeadLetterMessageAsync(ServiceBusReceiver receiver, ServiceBusReceivedMessage message)
+    {
+        await receiver.DeadLetterMessageAsync(message);
+    }
+
+    public async Task<ServiceBusReceivedMessage> ReceiveMessageAsync(ServiceBusReceiver receiver, CancellationToken cancellationToken)
+    {
+        return await receiver.ReceiveMessageAsync(cancellationToken: cancellationToken);
+    }
+
+    public async Task SendAsync<T>(T message, CancellationToken cancellationToken)
+        where T : class
+    {
+        try
         {
-            _serviceBusClient = serviceBusClient ?? throw new ArgumentNullException(nameof(serviceBusClient));
+            var sender = _serviceBusClient.CreateSender("queue.1");
+            var serviceBusMessage = new ServiceBusMessage(JsonSerializer.Serialize(message));
+            await sender.SendMessageAsync(serviceBusMessage, cancellationToken);
         }
-
-        public async Task SendAsync<T>(T message, CancellationToken cancellationToken)
-            where T : class
+        catch (Exception ex)
         {
-            try
-            {
-                var sender = _serviceBusClient.CreateSender("queue.1");
-                var serviceBusMessage = new ServiceBusMessage(JsonSerializer.Serialize(message));
-                await sender.SendMessageAsync(serviceBusMessage, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while sending the message", ex);
-            }
+            throw new Exception("An error occurred while sending the message", ex);
         }
     }
 }
