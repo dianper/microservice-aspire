@@ -27,4 +27,10 @@ public class CovidGlobalDailyModel
 
     [Index(7)]
     public string? CumulativeDeaths { get; set; }
+
+    [Ignore]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    [Ignore]
+    public Guid Identifier { get; set; }
 }

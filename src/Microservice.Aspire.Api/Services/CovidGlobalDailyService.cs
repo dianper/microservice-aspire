@@ -3,18 +3,18 @@
 using Microservice.Aspire.Api.Models;
 using System.Text.Json;
 
-public class CovidFileProcessingService(
+public class CovidGlobalDailyService(
     AzureBlobStorageService azureBlobStorageService,
     AzureServiceBusService azureServiceBusService,
     CsvReaderService csvReaderService,
     MongoDbService mongoDbService,
-    ILogger<CovidFileProcessingService> logger) : BackgroundService
+    ILogger<CovidGlobalDailyService> logger) : BackgroundService
 {
     private readonly AzureBlobStorageService _azureBlobStorageService = azureBlobStorageService;
     private readonly AzureServiceBusService _azureServiceBusService = azureServiceBusService;
     private readonly CsvReaderService _csvReaderService = csvReaderService;
     private readonly MongoDbService _mongoDbService = mongoDbService;
-    private readonly ILogger<CovidFileProcessingService> _logger = logger;
+    private readonly ILogger<CovidGlobalDailyService> _logger = logger;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -62,8 +62,21 @@ public class CovidFileProcessingService(
                 // Read the CSV file
                 var records = _csvReaderService.Read<CovidGlobalDailyModel>(response.FileData);
 
+                foreach (var record in records)
+                {
+                    record.Identifier = file.Identifier;
+                }
+
                 // Save data to the database
                 await _mongoDbService.SaveManyAsync("covid", "globaldaily", records);
+
+                // Send a message to the next queue
+                file.Status = "Processed";
+
+                await _azureServiceBusService.SendAsync(
+                    queueName: "queue.2",
+                    message: file,
+                    cancellationToken: stoppingToken);
 
                 // Complete the message
                 await _azureServiceBusService.CompleteMessageAsync(receiver, message);

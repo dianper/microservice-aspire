@@ -20,34 +20,7 @@ public class FileController(
     private readonly AzureServiceBusService _azureServiceBusService = azureServiceBusService;
     private readonly ILogger<FileController> _logger = logger;
 
-    //[HttpGet("get")]
-    //public async Task<IEnumerable<WeatherForecast>> GetAsync()
-    //{
-    //    var cacheValue = await _database.StringGetAsync("weather");
-
-    //    if (cacheValue.HasValue)
-    //    {
-    //        return JsonSerializer.Deserialize<IEnumerable<WeatherForecast>>(cacheValue);
-    //    }
-
-    //    var weatherForecast = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-    //    {
-    //        Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-    //        TemperatureC = Random.Shared.Next(-20, 55),
-    //        Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-    //    })
-    //    .ToArray();
-
-    //    // Refresh the cache every 15 seconds
-    //    await _database.StringSetAsync(
-    //        key: "weather",
-    //        value: JsonSerializer.Serialize(weatherForecast),
-    //        expiry: TimeSpan.FromSeconds(15));
-
-    //    return weatherForecast;
-    //}
-
-    [HttpPost("upload")]
+    [HttpPost]
     public async Task<IActionResult> UploadAsync(IFormFile file, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(file, nameof(file));
@@ -72,7 +45,15 @@ public class FileController(
         }
 
         // Send a message to the Azure Service Bus
-        await _azureServiceBusService.SendAsync(new FileModel(file.FileName, blobResponse.BlobUri), cancellationToken);
+        await _azureServiceBusService.SendAsync(
+            queueName: "queue.1",
+            message: new FileModel(Guid.NewGuid())
+            {
+                BlobUri = blobResponse.BlobUri,
+                Name = file.FileName,
+                Status = "Uploaded"
+            },
+            cancellationToken);
 
         return Ok(blobResponse);
     }

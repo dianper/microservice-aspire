@@ -67,7 +67,7 @@
             builder.Services.AddSwaggerGen();
 
             // Add Background Services
-            builder.Services.AddBackgroundService();
+            builder.Services.AddCovidDailyBackgroundService();
 
             return builder;
         }

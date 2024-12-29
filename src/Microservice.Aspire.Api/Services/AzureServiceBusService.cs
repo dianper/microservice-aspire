@@ -27,12 +27,12 @@ public class AzureServiceBusService(ServiceBusClient serviceBusClient)
         return await receiver.ReceiveMessageAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task SendAsync<T>(T message, CancellationToken cancellationToken)
+    public async Task SendAsync<T>(string queueName, T message, CancellationToken cancellationToken)
         where T : class
     {
         try
         {
-            var sender = _serviceBusClient.CreateSender("queue.1");
+            var sender = _serviceBusClient.CreateSender(queueName);
             var serviceBusMessage = new ServiceBusMessage(JsonSerializer.Serialize(message));
             await sender.SendMessageAsync(serviceBusMessage, cancellationToken);
         }
