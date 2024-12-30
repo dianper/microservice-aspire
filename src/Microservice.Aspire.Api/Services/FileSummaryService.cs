@@ -1,6 +1,7 @@
 ﻿namespace Microservice.Aspire.Api.Services;
 
 using Microservice.Aspire.Api.Configurations;
+using Microservice.Aspire.Api.Constants;
 using Microservice.Aspire.Api.Models;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
@@ -71,7 +72,7 @@ public class FileSummaryService(
                 await postgresService.InsertGlobalSummariesAsync(summaries, stoppingToken);
 
                 // Save the aggregate data to Redis
-                await _redisService.SetAsync("globalsummaries", summaries);
+                await _redisService.SetAsync(RedisConstants.GlobalSummaryCacheKey, summaries);
             }
             catch (Exception)
             {
