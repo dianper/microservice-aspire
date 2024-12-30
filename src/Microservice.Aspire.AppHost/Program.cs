@@ -65,6 +65,11 @@ var postgres = builder
 
 var postgresdb = postgres.AddDatabase("postgresdb");
 
+// Prometheus
+builder.AddContainer("prometheus", "prom/prometheus")
+    .WithEndpoint(port: 9090, targetPort: 9090)
+    .WithBindMount("../../prometheus", "/etc/prometheus");
+
 // Api
 builder
     .AddProject<Projects.Microservice_Aspire_Api>("api")

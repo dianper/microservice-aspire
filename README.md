@@ -82,10 +82,9 @@ Manually upload a CSV file to be processed.
 
 ## Deployment
 
-### **Docker Compose**
-Let's use Aspirate to generate the Docker Compose file for the application.
+Let's use Aspir8 to generate the Docker Compose file and Helm chart for the application.
 
-1. **Install Aspirate**:
+1. **Install Aspir8**:
    ```bash
    dotnet tool install -g aspirate
    ```
@@ -95,6 +94,12 @@ Let's use Aspirate to generate the Docker Compose file for the application.
    aspirate generate --output-format compose
    ```
 
+3. **Generating Helm Chart**:
+   ```bash
+   aspirate generate --output-format helm
+   ```
+
 ## References
 - [.NET Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/get-started/aspire-overview)
+- [Aspir8](https://prom3theu5.github.io/aspirational-manifests/getting-started.html)
 - [CsvHelper](https://joshclose.github.io/CsvHelper/)
