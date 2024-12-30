@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json.schemastore.org/aspire-8.0.json",
+  "resources": {
+    "password": {
+      "type": "parameter.v0",
+      "value": "{password.inputs.value}",
+      "inputs": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "sql": {
+      "type": "container.v0",
+      "connectionString": "Server={sql.bindings.tcp.host},{sql.bindings.tcp.port};User ID=sa;Password={password.value};TrustServerCertificate=true",
+      "image": "mcr.microsoft.com/mssql/server:2022-latest",
+      "env": {
+        "ACCEPT_EULA": "Y",
+        "MSSQL_SA_PASSWORD": "{password.value}"
+      },
+      "bindings": {
+        "tcp": {
+          "scheme": "tcp",
+          "protocol": "tcp",
+          "transport": "tcp",
+          "port": 58349,
+          "targetPort": 1433
+        }
+      }
+    },
+    "servicebus": {
+      "type": "container.v0",
+      "image": "mcr.microsoft.com/azure-messaging/servicebus-emulator:latest",
+      "bindMounts": [
+        {
+          "source": "Config.json",
+          "target": "/ServiceBus_Emulator/ConfigFiles/Config.json",
+          "readOnly": false
+        }
+      ],
+      "env": {
+        "services__sql__tcp__0": "{sql.bindings.tcp.url}",
+        "ACCEPT_EULA": "Y",
+        "SQL_SERVER": "sql",
+        "MSSQL_SA_PASSWORD": "Password123!"
+      },
+      "bindings": {
+        "servicebus": {
+          "scheme": "tcp",
+          "protocol": "tcp",
+          "transport": "tcp",
+          "targetPort": 5672
+        }
+      }
+    },
+    "cache": {
+      "type": "container.v0",
+      "connectionString": "{cache.bindings.tcp.host}:{cache.bindings.tcp.port}",
+      "image": "docker.io/library/redis:7.4",
+      "bindings": {
+        "tcp": {
+          "scheme": "tcp",
+          "protocol": "tcp",
+          "transport": "tcp",
+          "targetPort": 6379
+        }
+      }
+    },
+    "storage": {
+      "type": "azure.bicep.v0",
+      "path": "storage.module.bicep",
+      "params": {
+        "principalId": "",
+        "principalType": ""
+      }
+    },
+    "blobs": {
+      "type": "value.v0",
+      "connectionString": "{storage.outputs.blobEndpoint}"
+    },
+    "mongo-user": {
+      "type": "parameter.v0",
+      "value": "{mongo-user.inputs.value}",
+      "inputs": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "mongo-password": {
+      "type": "parameter.v0",
+      "value": "{mongo-password.inputs.value}",
+      "inputs": {
+        "value": {
+          "type": "string",
+          "secret": true
+        }
+      }
+    },
+    "mongo": {
+      "type": "container.v0",
+      "connectionString": "mongodb://{mongo-user.value}:{mongo-password.value}@{mongo.bindings.tcp.host}:{mongo.bindings.tcp.port}?authSource=admin\u0026authMechanism=SCRAM-SHA-256",
+      "image": "docker.io/library/mongo:8.0",
+      "env": {
+        "MONGO_INITDB_ROOT_USERNAME": "{mongo-user.value}",
+        "MONGO_INITDB_ROOT_PASSWORD": "{mongo-password.value}"
+      },
+      "bindings": {
+        "tcp": {
+          "scheme": "tcp",
+          "protocol": "tcp",
+          "transport": "tcp",
+          "targetPort": 27017
+        }
+      }
+    },
+    "mongodb": {
+      "type": "value.v0",
+      "connectionString": "mongodb://{mongo-user.value}:{mongo-password.value}@{mongo.bindings.tcp.host}:{mongo.bindings.tcp.port}/mongodb?authSource=admin\u0026authMechanism=SCRAM-SHA-256"
+    },
+    "pg-user": {
+      "type": "parameter.v0",
+      "value": "{pg-user.inputs.value}",
+      "inputs": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "pg-password": {
+      "type": "parameter.v0",
+      "value": "{pg-password.inputs.value}",
+      "inputs": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "postgres": {
+      "type": "container.v0",
+      "connectionString": "Host={postgres.bindings.tcp.host};Port={postgres.bindings.tcp.port};Username={pg-user.value};Password={pg-password.value}",
+      "image": "docker.io/library/postgres:17.0",
+      "env": {
+        "POSTGRES_HOST_AUTH_METHOD": "scram-sha-256",
+        "POSTGRES_INITDB_ARGS": "--auth-host=scram-sha-256 --auth-local=scram-sha-256",
+        "POSTGRES_USER": "{pg-user.value}",
+        "POSTGRES_PASSWORD": "{pg-password.value}"
+      },
+      "bindings": {
+        "tcp": {
+          "scheme": "tcp",
+          "protocol": "tcp",
+          "transport": "tcp",
+          "port": 58198,
+          "targetPort": 5432
+        }
+      }
+    },
+    "postgresdb": {
+      "type": "value.v0",
+      "connectionString": "{postgres.connectionString};Database=postgresdb"
+    },
+    "api": {
+      "type": "project.v0",
+      "path": "../Microservice.Aspire.Api/Microservice.Aspire.Api.csproj",
+      "env": {
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES": "true",
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY": "in_memory",
+        "ASPNETCORE_FORWARDEDHEADERS_ENABLED": "true",
+        "HTTP_PORTS": "{api.bindings.http.targetPort}",
+        "ConnectionStrings__cache": "{cache.connectionString}",
+        "services__servicebus__servicebus__0": "{servicebus.bindings.servicebus.url}",
+        "ConnectionStrings__blobs": "{blobs.connectionString}",
+        "ConnectionStrings__mongodb": "{mongodb.connectionString}",
+        "ConnectionStrings__postgresdb": "{postgresdb.connectionString}"
+      },
+      "bindings": {
+        "http": {
+          "scheme": "http",
+          "protocol": "tcp",
+          "transport": "http"
+        },
+        "https": {
+          "scheme": "https",
+          "protocol": "tcp",
+          "transport": "http"
+        }
+      }
+    }
+  }
+}

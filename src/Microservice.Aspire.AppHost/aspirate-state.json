@@ -1,0 +1,53 @@
+{
+  "projectPath": ".",
+  "outputPath": "aspirate-output",
+  "containerImageTags": [
+    "latest"
+  ],
+  "containerBuilder": "docker",
+  "outputFormat": "compose",
+  "privateRegistryEmail": "aspir8@aka.ms",
+  "includeDashboard": false,
+  "secrets": {
+    "salt": "l5SHBxUTnyiG80UA",
+    "hash": "gdeI6UGzZ9/1K9JJnG5B7yvFQcdOFShfHLWyvGPL2Cw=",
+    "secrets": {
+      "password": {
+        "value": "l5SHBxUTnyiG80UAgEUYg\u002BuCDmvXcVToBb\u002Bn5BVj\u002BNY="
+      },
+      "mongo-user": {
+        "value": "l5SHBxUTnyiG80UAXhpYxt042fqwZbOtLNwnu1EnrJYD"
+      },
+      "mongo-password": {
+        "value": "l5SHBxUTnyiG80UAyrzUAGB4ONETTL7aI2g42BVm\u002BtAHxQ=="
+      },
+      "pg-user": {
+        "value": "l5SHBxUTnyiG80UAXhpYxt042fqwZbOtLNwnu1EnrJYD"
+      },
+      "pg-password": {
+        "value": "l5SHBxUTnyiG80UAyrzUAGB4ONETTL7aI2g42BVm\u002BtAHxQ=="
+      },
+      "sql": {
+        "MSSQL_SA_PASSWORD": "l5SHBxUTnyiG80UAgEUYg\u002BuCDmvXcVToBb\u002Bn5BVj\u002BNY="
+      },
+      "servicebus": {
+        "MSSQL_SA_PASSWORD": "l5SHBxUTnyiG80UAwb1wYVKtyPbzbPeNWhKinHQ1updFnJZeaO8QQA=="
+      },
+      "cache": {},
+      "blobs": {},
+      "mongo": {},
+      "mongodb": {},
+      "postgres": {
+        "POSTGRES_PASSWORD": "l5SHBxUTnyiG80UAyrzUAGB4ONETTL7aI2g42BVm\u002BtAHxQ=="
+      },
+      "postgresdb": {},
+      "api": {
+        "ConnectionStrings__cache": "l5SHBxUTnyiG80UALWXcSjmQ4s9tkqgGprSwrUc1qoxXydIJbuQ=",
+        "ConnectionStrings__blobs": "l5SHBxUTnyiG80UAs0Eeq853pQXJtNyrIzqE0l8nvYtAkoNfd7JWFcE\u002BuAkbnWjxk1sjS\u002BxlwJO0zA==",
+        "ConnectionStrings__mongodb": "l5SHBxUTnyiG80UAgwulVz1J4P/Nyiim4tQEnEk7p4Ndl4YAdvJWEtQ5/UAEzTeqxCgNQvNkzpL6g/XyshDowQDyLwfHH5I21OgwS9JcdIiWenWRHO9XrPDEmtEs/6zRzrQXtbZCL6rb57T9wP\u002BCzqYcJw==",
+        "ConnectionStrings__postgresdb": "l5SHBxUTnyiG80UA7XqTvyNwHTc401SNCBvA/Gw7upAPg4tJLbpRBMJwnBVHizmryS90F6df2piy36Ov5hqy3wrueVPzHN4k1vMqfIAYNNjHciLONedN6/PQndxc6qDK270Mo6gbHg=="
+      }
+    }
+  },
+  "processAllComponents": true
+}

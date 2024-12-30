@@ -1,0 +1,72 @@
+services:
+  sql:
+    container_name: "sql"
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Password123!"
+    ports:
+    - target: 1433
+      published: 58349
+    restart: unless-stopped
+  servicebus:
+    container_name: "servicebus"
+    image: "mcr.microsoft.com/azure-messaging/servicebus-emulator:latest"
+    environment:
+      services__sql__tcp__0: "sql:1433"
+      ACCEPT_EULA: "Y"
+      SQL_SERVER: "sql"
+      MSSQL_SA_PASSWORD: "Password123!"
+    ports:
+    - target: 5672
+      published: 5672
+    restart: unless-stopped
+  cache:
+    container_name: "cache"
+    image: "docker.io/library/redis:7.4"
+    ports:
+    - target: 6379
+      published: 6379
+    restart: unless-stopped
+  mongo:
+    container_name: "mongo"
+    image: "docker.io/library/mongo:8.0"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "user1"
+      MONGO_INITDB_ROOT_PASSWORD: "123456"
+    ports:
+    - target: 27017
+      published: 27017
+    restart: unless-stopped
+  postgres:
+    container_name: "postgres"
+    image: "docker.io/library/postgres:17.0"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+      POSTGRES_USER: "user1"
+      POSTGRES_PASSWORD: "123456"
+    ports:
+    - target: 5432
+      published: 58198
+    restart: unless-stopped
+  api:
+    container_name: "api"
+    image: "api:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+      ConnectionStrings__cache: "cache:6379"
+      services__servicebus__servicebus__0: "servicebus:5672"
+      ConnectionStrings__blobs: "UseDevelopmentStorage=true;"
+      ConnectionStrings__mongodb: "mongodb://user1:123456@mongo:27017/mongodb?authSource=admin&authMechanism=SCRAM-SHA-256"
+      ConnectionStrings__postgresdb: "Host=postgres;Port=58198;Username=user1;Password=123456;Database=postgresdb"
+    ports:
+    - target: 8080
+      published: 10000
+    - target: 8443
+      published: 10001
+    restart: unless-stopped

@@ -1,8 +1,17 @@
-# File Process Application
+# .NET Aspire Application
 
+## .NET Aspire Overview
+
+.NET Aspire is designed to enhance the development of cloud-native .NET applications by providing a consistent set of tools and patterns for building and running distributed apps. It helps developers with:
+
+- **Orchestration**: Simplifies the management of multi-project applications and their dependencies in local development environments.
+- **Integrations**: Offers NuGet packages for common services (e.g., Redis, PostgreSQL) with standardized interfaces for seamless app integration.
+- **Tooling**: Provides project templates and tooling support for Visual Studio, Visual Studio Code, and the .NET CLI, making it easier to create and work with .NET Aspire projects.
+
+## Introduction
 This application implements a basic file process designed to handle COVID-related files. It supports file uploading, processing, data aggregation, and storage into multiple databases, while also providing an endpoint for retrieving the aggregated summary.
 
-The application uses **.NET 9** along with various resources like: 
+The application uses various resources like:
 
 - Azure Blob Storage (Emulator)
 - Azure Service Bus (Emulator)
@@ -14,15 +23,6 @@ The application uses **.NET 9** along with various resources like:
 - .NET 9 SDK
 - .NET Aspire
 - Docker
-
-## .NET Aspire
-.NET Aspire is designed to improve the experience of building .NET cloud-native apps. It provides a consistent, opinionated set of tools and patterns that help you build and run distributed apps.
-
-.NET Aspire is designed to help you with:
-
-- Orchestration: .NET Aspire provides features for running and connecting multi-project applications and their dependencies for local development environments.
-- Integrations: .NET Aspire integrations are NuGet packages for commonly used services, such as Redis or Postgres, with standardized interfaces ensuring they connect consistently and seamlessly with your app.
-- Tooling: .NET Aspire comes with project templates and tooling experiences for Visual Studio, Visual Studio Code, and the .NET CLI to help you create and interact with .NET Aspire projects.
 
 ## Features
 
@@ -79,3 +79,22 @@ Retrieve the global summary. The service checks **Redis** for cached data first;
 Manually upload a CSV file to be processed.
 
 - **Request body**: Multipart form-data containing the file.
+
+## Deployment
+
+### **Docker Compose**
+Let's use Aspirate to generate the Docker Compose file for the application.
+
+1. **Install Aspirate**:
+   ```bash
+   dotnet tool install -g aspirate
+   ```
+
+2. **Generating Docker Compose**:
+   ```bash
+   aspirate generate --output-format compose
+   ```
+
+## References
+- [.NET Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/get-started/aspire-overview)
+- [CsvHelper](https://joshclose.github.io/CsvHelper/)
