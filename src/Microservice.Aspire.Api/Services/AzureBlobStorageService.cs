@@ -2,7 +2,7 @@
 
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Microservice.Aspire.Api.Responses;
+using Microservice.Aspire.Api.Services.Responses;
 
 public class AzureBlobStorageService(
     BlobServiceClient blobServiceClient,

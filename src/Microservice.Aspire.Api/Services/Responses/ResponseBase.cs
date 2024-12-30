@@ -1,4 +1,4 @@
-﻿namespace Microservice.Aspire.Api.Responses;
+﻿namespace Microservice.Aspire.Api.Services.Responses;
 
 public abstract class ResponseBase
 {

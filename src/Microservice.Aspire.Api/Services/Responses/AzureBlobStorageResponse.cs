@@ -1,4 +1,4 @@
-﻿namespace Microservice.Aspire.Api.Responses;
+﻿namespace Microservice.Aspire.Api.Services.Responses;
 
 public class AzureBlobStorageResponse : ResponseBase
 {
@@ -23,15 +23,6 @@ public class AzureBlobStorageResponse : ResponseBase
             IsValid = true,
             Message = message,
             FileData = fileData
-        };
-    }
-
-    public static AzureBlobStorageResponse Failure(string message)
-    {
-        return new AzureBlobStorageResponse
-        {
-            IsValid = false,
-            Message = message
         };
     }
 

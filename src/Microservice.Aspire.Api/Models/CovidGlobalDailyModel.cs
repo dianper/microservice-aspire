@@ -32,5 +32,5 @@ public class CovidGlobalDailyModel
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [Ignore]
-    public Guid Identifier { get; set; }
+    public string? Identifier { get; set; }
 }

@@ -1,35 +1,34 @@
-namespace Microservice.Aspire.Api
+namespace Microservice.Aspire.Api;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        var builder = WebApplication.CreateBuilder(args);
+
+        var configuration = builder.Configuration;
+
+        builder.AddApplicationDependencies(configuration);
+
+        builder.AddServiceDependencies();
+
+        var app = builder.Build();
+
+        app.MapDefaultEndpoints();
+
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
         {
-            var builder = WebApplication.CreateBuilder(args);
-
-            var configuration = builder.Configuration;
-
-            builder.AddApplicationDependencies(configuration);
-
-            builder.AddServiceDependencies();
-
-            var app = builder.Build();
-
-            app.MapDefaultEndpoints();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-            app.MapControllers();
-
-            app.Run();
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
+
+        app.UseHttpsRedirection();
+
+        app.UseAuthorization();
+
+        app.MapControllers();
+
+        app.Run();
     }
 }

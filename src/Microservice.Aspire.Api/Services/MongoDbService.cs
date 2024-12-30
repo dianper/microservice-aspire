@@ -1,17 +1,22 @@
 ﻿namespace Microservice.Aspire.Api.Services;
 
+using Microservice.Aspire.Api.Constants;
 using MongoDB.Driver;
 
 public class MongoDbService(IMongoClient mongoClient)
 {
-    private readonly IMongoClient _mongoClient = mongoClient;
+    private readonly IMongoDatabase _database = mongoClient.GetDatabase(MongoDbConstants.CovidDatabase);
 
-    public async Task SaveManyAsync<T>(string databaseName, string collectionName, IEnumerable<T> records)
+    public async Task<bool> ExistsAsync<T>(string collectionName, string column, string value)
     {
-        var database = _mongoClient.GetDatabase(databaseName);
-        var collection = database.GetCollection<T>(collectionName);
+        var collection = _database.GetCollection<T>(collectionName);
+        var filter = Builders<T>.Filter.Eq(column, value);
+        return await collection.Find(filter).AnyAsync();
+    }
 
-        await collection.DeleteManyAsync(Builders<T>.Filter.Empty);
+    public async Task InsertManyAsync<T>(string collectionName, IEnumerable<T> records)
+    {
+        var collection = _database.GetCollection<T>(collectionName);
         await collection.InsertManyAsync(records);
     }
 }
