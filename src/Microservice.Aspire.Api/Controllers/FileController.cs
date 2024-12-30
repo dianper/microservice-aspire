@@ -7,7 +7,6 @@ using Microservice.Aspire.Api.Models;
 using Microservice.Aspire.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using StackExchange.Redis;
 using System.Text;
 
 [ApiVersion("1.0")]
@@ -20,7 +19,6 @@ public class FileController(
     IOptions<FileCollectorSettings> fileSettingsOptions,
     IOptions<MongoDbSettings> mongoDbSettingsOptions,
     IOptions<ServiceBusSettings> serviceBusSettingsOptions,
-    IConnectionMultiplexer connectionMultiplexer,
     ILogger<FileController> logger) : ControllerBase
 {
     private readonly AzureBlobStorageService _azureBlobStorageService = azureBlobStorageService;
@@ -31,7 +29,6 @@ public class FileController(
     private readonly MongoDbSettings _mongoDbSettings = mongoDbSettingsOptions.Value;
     private readonly ServiceBusSettings _serviceBusSettings = serviceBusSettingsOptions.Value;
 
-    private readonly IDatabase _database = connectionMultiplexer.GetDatabase();
     private readonly ILogger<FileController> _logger = logger;
 
     [HttpPost]

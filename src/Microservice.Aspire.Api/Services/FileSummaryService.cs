@@ -8,6 +8,7 @@ using System.Text.Json;
 public class FileSummaryService(
     AzureServiceBusService azureServiceBusService,
     MongoDbService mongoDbService,
+    RedisService redisService,
     IOptions<MongoDbSettings> mongoDbSettingsOptions,
     IOptions<ServiceBusSettings> serviceBusSettingsOptions,
     IServiceScopeFactory serviceScopeFactory,
@@ -15,8 +16,11 @@ public class FileSummaryService(
 {
     private readonly AzureServiceBusService _azureServiceBusService = azureServiceBusService;
     private readonly MongoDbService _mongoDbService = mongoDbService;
+    private readonly RedisService _redisService = redisService;
+
     private readonly MongoDbSettings _mongoDbSettings = mongoDbSettingsOptions.Value;
     private readonly ServiceBusSettings _serviceBusSettings = serviceBusSettingsOptions.Value;
+
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private readonly ILogger<FileSummaryService> _logger = logger;
 
@@ -59,10 +63,15 @@ public class FileSummaryService(
             try
             {
                 // Get aggregate data from MongoDB
-                var aggregatedValues = await _mongoDbService.GetGlobalSummaryAsync(_mongoDbSettings.GlobalDetailsCollection);
+                var summaries = await _mongoDbService.GetGlobalSummaryAsync(
+                    collectionName: _mongoDbSettings.GlobalDetailsCollection,
+                    identifier: file.Identifier);
 
                 // Save the aggregate data to Postgres
-                await postgresService.InsertGlobalSummariesAsync(aggregatedValues, stoppingToken);
+                await postgresService.InsertGlobalSummariesAsync(summaries, stoppingToken);
+
+                // Save the aggregate data to Redis
+                await _redisService.SetAsync("globalsummaries", summaries);
             }
             catch (Exception)
             {

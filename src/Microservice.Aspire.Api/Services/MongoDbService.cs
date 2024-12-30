@@ -11,9 +11,10 @@ public class MongoDbService(
 {
     private readonly IMongoDatabase _database = mongoClient.GetDatabase(mongoDbSettingsOptions.Value.DatabaseName);
 
-    public async Task<IEnumerable<GlobalSummaryModel>> GetGlobalSummaryAsync(string collectionName)
+    public async Task<IEnumerable<GlobalSummaryModel>> GetGlobalSummaryAsync(string collectionName, string identifier)
     {
         var pipeline = new EmptyPipelineDefinition<GlobalDetailsModel>()
+            .Match(x => x.Identifier == identifier)
             .Group(
                 x => x.CountryName!,
                 g => new GlobalSummaryModel

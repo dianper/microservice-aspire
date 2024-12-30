@@ -27,6 +27,8 @@ public class PostgresService(
     {
         try
         {
+            // Remove existing records to avoid duplicates
+            _dbContext.GlobalSummaries.RemoveRange(_dbContext.GlobalSummaries);
             await _dbContext.GlobalSummaries.AddRangeAsync(records, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }

@@ -9,7 +9,8 @@
                 .AddSingleton<AzureServiceBusService>()
                 .AddSingleton<CsvReaderService>()
                 .AddSingleton<MongoDbService>()
-                .AddScoped<PostgresService>();
+                .AddScoped<PostgresService>()
+                .AddSingleton<RedisService>();
 
             return services;
         }
