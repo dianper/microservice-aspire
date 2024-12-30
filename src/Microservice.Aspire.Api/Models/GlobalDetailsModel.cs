@@ -17,16 +17,16 @@ public class GlobalDetailsModel
     public string? WhoRegion { get; set; }
 
     [Index(4)]
-    public string? NewCases { get; set; }
+    public int? NewCases { get; set; }
 
     [Index(5)]
-    public string? CumulativeCases { get; set; }
+    public int? CumulativeCases { get; set; }
 
     [Index(6)]
-    public string? NewDeaths { get; set; }
+    public int? NewDeaths { get; set; }
 
     [Index(7)]
-    public string? CumulativeDeaths { get; set; }
+    public int? CumulativeDeaths { get; set; }
 
     [Ignore]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

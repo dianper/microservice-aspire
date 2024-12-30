@@ -10,10 +10,11 @@ public class CsvReaderService
     {
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            HasHeaderRecord = true,
+            BadDataFound = null,
             Delimiter = ",",
+            HasHeaderRecord = true,
+            IgnoreBlankLines = false,
             MissingFieldFound = null,
-            BadDataFound = null
         };
 
         using var memory = new MemoryStream(data);

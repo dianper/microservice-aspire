@@ -16,22 +16,19 @@ public static class ProgramExtensions
         builder.AddAzureBlobClient("blobs");
 
         // Azure ServiceBus
-        builder.AddAzureServiceBusClient("servicebus", settings =>
-        {
-            settings.ConnectionString = configuration.GetConnectionString("serviceBus");
-        });
+        builder.AddAzureServiceBusClient("servicebus",
+            settings => settings.ConnectionString = configuration.GetConnectionString("serviceBus"));
 
         // MongoDB
-        builder.AddMongoDBClient("mongodb", settings =>
-        {
-            settings.ConnectionString = configuration.GetConnectionString("mongo");
-        });
+        builder.AddMongoDBClient("mongodb",
+            settings => settings.ConnectionString = configuration.GetConnectionString("mongo"));
+
+        // Postgres
+        builder.AddNpgsqlDbContext<ApiDbContext>("postgresdb",
+            settings => settings.ConnectionString = configuration.GetConnectionString("postgres"));
 
         // Redis Cache
         builder.AddRedisClient("cache");
-
-        // Postgres
-        builder.AddNpgsqlDbContext<ApiDbContext>("postgresdb");
 
         return builder;
     }
@@ -45,10 +42,8 @@ public static class ProgramExtensions
             .Configure<ServiceBusSettings>(configuration.GetSection("ServiceBus"));
 
         // HttpClient
-        builder.Services.AddHttpClient<FileUploaderClient>(client =>
-        {
-            client.BaseAddress = new Uri("http://localhost:5014");
-        });
+        builder.Services.AddHttpClient<FileUploaderClient>(
+            client => client.BaseAddress = new Uri("http://localhost:5014"));
 
         // Services
         builder.Services.AddServices();
@@ -83,5 +78,13 @@ public static class ProgramExtensions
         builder.Services.AddHostedServices();
 
         return builder;
+    }
+
+    public static IApplicationBuilder EnsureDatabaseCreated(this IApplicationBuilder app)
+    {
+        using var scope = app.ApplicationServices.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+        dbContext.Database.EnsureCreated();
+        return app;
     }
 }

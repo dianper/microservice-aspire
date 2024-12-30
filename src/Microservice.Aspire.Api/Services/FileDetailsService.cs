@@ -47,7 +47,7 @@ public class FileDetailsService(
                 {
                     _logger.LogInformation("No message received");
                     // Wait for 15 seconds before processing the next message
-                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+                    await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken);
                     continue;
                 }
 

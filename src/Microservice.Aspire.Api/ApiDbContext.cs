@@ -10,5 +10,5 @@ public class ApiDbContext : DbContext
     {
     }
 
-    public DbSet<GlobalSummaryModel> GlobalSummaries { get; set; }
+    public virtual DbSet<GlobalSummaryModel> GlobalSummaries { get; set; }
 }

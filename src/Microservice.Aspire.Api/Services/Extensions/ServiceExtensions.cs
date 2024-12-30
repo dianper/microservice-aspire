@@ -8,7 +8,8 @@
                 .AddSingleton<AzureBlobStorageService>()
                 .AddSingleton<AzureServiceBusService>()
                 .AddSingleton<CsvReaderService>()
-                .AddSingleton<MongoDbService>();
+                .AddSingleton<MongoDbService>()
+                .AddScoped<PostgresService>();
 
             return services;
         }
@@ -17,7 +18,8 @@
         {
             services
                 .AddHostedService<FileCollectorService>()
-                .AddHostedService<FileDetailsService>();
+                .AddHostedService<FileDetailsService>()
+                .AddHostedService<FileSummaryService>();
 
             return services;
         }

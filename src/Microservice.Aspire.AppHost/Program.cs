@@ -54,9 +54,13 @@ var mongodb = mongo
     .AddDatabase("mongodb");
 
 // Postgres
+var pgUser = builder.AddParameter("pg-user", "user1");
+var pgPass = builder.AddParameter("pg-password", "123456");
+
 var postgres = builder
-    .AddPostgres("postgres")
+    .AddPostgres("postgres", userName: pgUser, password: pgPass, port: 58198)
     .WithLifetime(ContainerLifetime.Persistent)
+    .WithPgAdmin()
     .WithPgWeb();
 
 var postgresdb = postgres.AddDatabase("postgresdb");
