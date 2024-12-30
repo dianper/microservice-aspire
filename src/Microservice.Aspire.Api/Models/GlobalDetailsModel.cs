@@ -2,7 +2,7 @@
 
 using CsvHelper.Configuration.Attributes;
 
-public class CovidGlobalDailyModel
+public class GlobalDetailsModel
 {
     [Index(0)]
     public string? DateReported { get; set; }
@@ -33,4 +33,7 @@ public class CovidGlobalDailyModel
 
     [Ignore]
     public string? Identifier { get; set; }
+
+    [Ignore]
+    public string? FileName { get; set; }
 }

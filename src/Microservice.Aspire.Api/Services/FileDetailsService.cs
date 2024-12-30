@@ -1,8 +1,10 @@
 ﻿namespace Microservice.Aspire.Api.Services;
 
+using Microservice.Aspire.Api.Configurations;
 using Microservice.Aspire.Api.Constants;
 using Microservice.Aspire.Api.Models;
 using Microservice.Aspire.Api.Models.Extensions;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 public class FileDetailsService(
@@ -10,12 +12,18 @@ public class FileDetailsService(
     AzureServiceBusService azureServiceBusService,
     CsvReaderService csvReaderService,
     MongoDbService mongoDbService,
+    IOptions<MongoDbSettings> mongoDbSettingsOptions,
+    IOptions<ServiceBusSettings> serviceBusSettingsOptions,
     ILogger<FileDetailsService> logger) : BackgroundService
 {
     private readonly AzureBlobStorageService _azureBlobStorageService = azureBlobStorageService;
     private readonly AzureServiceBusService _azureServiceBusService = azureServiceBusService;
     private readonly CsvReaderService _csvReaderService = csvReaderService;
     private readonly MongoDbService _mongoDbService = mongoDbService;
+
+    private readonly MongoDbSettings _mongoDbSettings = mongoDbSettingsOptions.Value;
+    private readonly ServiceBusSettings _serviceBusSettings = serviceBusSettingsOptions.Value;
+
     private readonly ILogger<FileDetailsService> _logger = logger;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -27,7 +35,7 @@ public class FileDetailsService(
         _logger.LogInformation("File details service is running");
 
         // Create a receiver
-        var receiver = _azureServiceBusService.CreateReceiver(QueueConstants.CovidGlobalDetailsQueue);
+        var receiver = _azureServiceBusService.CreateReceiver(_serviceBusSettings.GlobalDetailsQueue);
 
         try
         {
@@ -62,17 +70,17 @@ public class FileDetailsService(
                 }
 
                 // Read the CSV file
-                var records = _csvReaderService.Read<CovidGlobalDailyModel>(response.FileData);
-                records.SetIdentifier(file.Identifier);
+                var records = _csvReaderService.Read<GlobalDetailsModel>(response.FileData);
+                records.SetIdentifiers(file.Identifier, file.Name);
 
                 // Save data to the database
-                await _mongoDbService.InsertManyAsync(MongoDbConstants.CovidGlobalDailyCollection, records);
+                await _mongoDbService.InsertManyAsync(_mongoDbSettings.GlobalDetailsCollection, records);
 
                 // Send a message to the next queue
-                file.Status = FileConstants.FileProcessedStatus;
+                file.Status = FileStatus.Processed;
 
                 await _azureServiceBusService.SendAsync(
-                    queueName: QueueConstants.CovidGlobalSummaryQueue,
+                    queueName: _serviceBusSettings.GlobalSummaryQueue,
                     message: file,
                     cancellationToken: stoppingToken);
 

@@ -2,11 +2,12 @@
 
 public static class CovidGlobalDailyModelExtensions
 {
-    public static void SetIdentifier(this IEnumerable<CovidGlobalDailyModel> models, string identifier)
+    public static void SetIdentifiers(this IEnumerable<GlobalDetailsModel> models, string identifier, string fileName)
     {
         foreach (var model in models)
         {
             model.Identifier = identifier;
+            model.FileName = fileName;
         }
     }
 }

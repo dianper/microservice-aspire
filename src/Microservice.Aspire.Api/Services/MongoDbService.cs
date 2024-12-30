@@ -1,11 +1,14 @@
 ﻿namespace Microservice.Aspire.Api.Services;
 
-using Microservice.Aspire.Api.Constants;
+using Microservice.Aspire.Api.Configurations;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
-public class MongoDbService(IMongoClient mongoClient)
+public class MongoDbService(
+    IMongoClient mongoClient,
+    IOptions<MongoDbSettings> mongoDbSettingsOptions)
 {
-    private readonly IMongoDatabase _database = mongoClient.GetDatabase(MongoDbConstants.CovidDatabase);
+    private readonly IMongoDatabase _database = mongoClient.GetDatabase(mongoDbSettingsOptions.Value.DatabaseName);
 
     public async Task<bool> ExistsAsync<T>(string collectionName, string column, string value)
     {

@@ -10,7 +10,7 @@ public class Program
 
         builder.AddApplicationDependencies(configuration);
 
-        builder.AddServiceDependencies();
+        builder.AddServiceDependencies(configuration);
 
         var app = builder.Build();
 

@@ -1,12 +1,15 @@
-﻿using Microservice.Aspire.Api.Constants;
+﻿namespace Microservice.Aspire.Api.Services;
 
-namespace Microservice.Aspire.Api.Services;
+using Microservice.Aspire.Api.Configurations;
+using Microsoft.Extensions.Options;
 
 public class FileCollectorService(
     FileUploaderClient fileUploaderClient,
+    IOptions<FileCollectorSettings> fileSettingsOptions,
     ILogger<FileCollectorService> logger) : BackgroundService
 {
     private readonly FileUploaderClient _fileUploaderClient = fileUploaderClient;
+    private readonly FileCollectorSettings _fileSettings = fileSettingsOptions.Value;
     private readonly ILogger<FileCollectorService> _logger = logger;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -21,7 +24,7 @@ public class FileCollectorService(
         {
             try
             {
-                var files = Directory.GetFiles(FileConstants.DirectoryPath, FileConstants.FileSearchPattern, SearchOption.TopDirectoryOnly);
+                var files = Directory.GetFiles(_fileSettings.DirectoryPath, _fileSettings.SearchPattern, SearchOption.TopDirectoryOnly);
 
                 foreach (var file in files)
                 {

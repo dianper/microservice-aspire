@@ -12,6 +12,7 @@
     <PackageReference Include="Aspire.Azure.Messaging.ServiceBus" Version="9.0.0" />
     <PackageReference Include="Aspire.Azure.Storage.Blobs" Version="9.0.0" />
     <PackageReference Include="Aspire.MongoDB.Driver" Version="9.0.0" />
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
     <PackageReference Include="Aspire.StackExchange.Redis" Version="9.0.0" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.2" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />

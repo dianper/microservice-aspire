@@ -1,10 +1,12 @@
 namespace Microservice.Aspire.Api.Controllers;
 
 using Asp.Versioning;
+using Microservice.Aspire.Api.Configurations;
 using Microservice.Aspire.Api.Constants;
 using Microservice.Aspire.Api.Models;
 using Microservice.Aspire.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using System.Text;
 
@@ -15,12 +17,19 @@ public class FileController(
     AzureBlobStorageService azureBlobStorageService,
     AzureServiceBusService azureServiceBusService,
     MongoDbService mongoDbService,
+    IOptions<FileCollectorSettings> fileSettingsOptions,
+    IOptions<MongoDbSettings> mongoDbSettingsOptions,
+    IOptions<ServiceBusSettings> serviceBusSettingsOptions,
     IConnectionMultiplexer connectionMultiplexer,
     ILogger<FileController> logger) : ControllerBase
 {
     private readonly AzureBlobStorageService _azureBlobStorageService = azureBlobStorageService;
     private readonly AzureServiceBusService _azureServiceBusService = azureServiceBusService;
     private readonly MongoDbService _mongoDbService = mongoDbService;
+
+    private readonly FileCollectorSettings _fileSettings = fileSettingsOptions.Value;
+    private readonly MongoDbSettings _mongoDbSettings = mongoDbSettingsOptions.Value;
+    private readonly ServiceBusSettings _serviceBusSettings = serviceBusSettingsOptions.Value;
 
     private readonly IDatabase _database = connectionMultiplexer.GetDatabase();
     private readonly ILogger<FileController> _logger = logger;
@@ -37,16 +46,16 @@ public class FileController(
 
         // Check if the file extension is CSV
         var extension = Path.GetExtension(file.FileName);
-        if (string.IsNullOrEmpty(extension) || !extension.Equals(FileConstants.FileExtension, StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrEmpty(extension) || !_fileSettings.AllowedExtensions.Contains(extension.ToLower()))
         {
             return BadRequest("Invalid file extension");
         }
 
         // Check if the file already exists in the database
         var fileId = Convert.ToBase64String(Encoding.UTF8.GetBytes(file.FileName));
-        if (await _mongoDbService.ExistsAsync<CovidGlobalDailyModel>(
-            MongoDbConstants.CovidGlobalDailyCollection,
-            nameof(CovidGlobalDailyModel.Identifier),
+        if (await _mongoDbService.ExistsAsync<GlobalDetailsModel>(
+            _mongoDbSettings.GlobalDetailsCollection,
+            nameof(GlobalDetailsModel.Identifier),
             fileId))
         {
             _logger.LogInformation("File already processed: {FileName}", file.FileName);
@@ -62,12 +71,12 @@ public class FileController(
 
         // Send a message to the Azure Service Bus
         await _azureServiceBusService.SendAsync(
-            queueName: QueueConstants.CovidGlobalDetailsQueue,
+            queueName: _serviceBusSettings.GlobalDetailsQueue,
             message: new FileModel(fileId)
             {
                 BlobUri = blobResponse.BlobUri,
                 Name = file.FileName,
-                Status = FileConstants.FileUploadedStatus
+                Status = FileStatus.Uploaded
             },
             cancellationToken);
 

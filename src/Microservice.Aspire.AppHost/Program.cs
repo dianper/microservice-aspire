@@ -53,6 +53,14 @@ var mongo = builder
 var mongodb = mongo
     .AddDatabase("mongodb");
 
+// Postgres
+var postgres = builder
+    .AddPostgres("postgres")
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithPgWeb();
+
+var postgresdb = postgres.AddDatabase("postgresdb");
+
 // Api
 builder
     .AddProject<Projects.Microservice_Aspire_Api>("api")
@@ -63,6 +71,8 @@ builder
     .WithReference(storage)
     .WaitFor(storage)
     .WithReference(mongodb)
-    .WaitFor(mongodb);
+    .WaitFor(mongodb)
+    .WithReference(postgresdb)
+    .WaitFor(postgresdb);
 
 builder.Build().Run();

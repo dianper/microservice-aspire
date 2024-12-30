@@ -1,6 +1,7 @@
 ﻿namespace Microservice.Aspire.Api;
 
 using Asp.Versioning;
+using Microservice.Aspire.Api.Configurations;
 using Microservice.Aspire.Api.Services;
 using Microservice.Aspire.Api.Services.Extensions;
 
@@ -29,11 +30,20 @@ public static class ProgramExtensions
         // Redis Cache
         builder.AddRedisClient("cache");
 
+        // Postgres
+        builder.AddNpgsqlDbContext<ApiDbContext>("postgresdb");
+
         return builder;
     }
 
-    public static IHostApplicationBuilder AddServiceDependencies(this IHostApplicationBuilder builder)
+    public static IHostApplicationBuilder AddServiceDependencies(this IHostApplicationBuilder builder, IConfiguration configuration)
     {
+        // Settings
+        builder.Services
+            .Configure<FileCollectorSettings>(configuration.GetSection("FileCollector"))
+            .Configure<MongoDbSettings>(configuration.GetSection("MongoDb"))
+            .Configure<ServiceBusSettings>(configuration.GetSection("ServiceBus"));
+
         // HttpClient
         builder.Services.AddHttpClient<FileUploaderClient>(client =>
         {
