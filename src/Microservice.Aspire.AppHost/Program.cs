@@ -71,7 +71,7 @@ builder.AddContainer("prometheus", "prom/prometheus")
     .WithBindMount("../../prometheus", "/etc/prometheus");
 
 // Api
-builder
+var api = builder
     .AddProject<Projects.Microservice_Aspire_Api>("api")
     .WithReference(redis)
     .WaitFor(redis)
@@ -82,6 +82,15 @@ builder
     .WithReference(mongodb)
     .WaitFor(mongodb)
     .WithReference(postgresdb)
-    .WaitFor(postgresdb);
+    .WaitFor(postgresdb)
+    .WithExternalHttpEndpoints();
+
+// Web
+builder.AddNpmApp("react-next-app", "../Microservice.Aspire.Web", "dev")
+    .WithEnvironment("BROWSER", "none")
+    .WithHttpEndpoint(env: "PORT")
+    .WithReference(api)
+    .WaitFor(api)
+    .WithExternalHttpEndpoints();
 
 builder.Build().Run();

@@ -68,6 +68,17 @@ public static class ProgramExtensions
             options.SubstituteApiVersionInUrl = true;
         });
 
+        builder.Services.AddCors(options =>
+        {
+            // Test purposes only
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
+
         builder.Services.AddControllers();
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

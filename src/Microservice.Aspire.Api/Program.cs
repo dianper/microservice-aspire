@@ -24,7 +24,8 @@ public class Program
             app.EnsureDatabaseCreated();
         }
 
-        app.UseHttpsRedirection();
+        //app.UseHttpsRedirection();
+        app.UseCors("AllowAll");
 
         app.UseAuthorization();
 

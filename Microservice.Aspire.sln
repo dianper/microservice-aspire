@@ -29,6 +29,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "prometheus", "prometheus", 
 		prometheus\prometheus.yml = prometheus\prometheus.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aspire", "Aspire", "{53F91D64-DB5A-4EDD-AA90-CA136F738ACC}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Microservice.Aspire.Web", "src\Microservice.Aspire.Web\Microservice.Aspire.Web.njsproj", "{EF736123-BC07-4B39-932E-9932ABB50DAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,14 +51,19 @@ Global
 		{B31D36D0-751C-4687-85A2-F7DC9331E215}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B31D36D0-751C-4687-85A2-F7DC9331E215}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B31D36D0-751C-4687-85A2-F7DC9331E215}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF736123-BC07-4B39-932E-9932ABB50DAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF736123-BC07-4B39-932E-9932ABB50DAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF736123-BC07-4B39-932E-9932ABB50DAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF736123-BC07-4B39-932E-9932ABB50DAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A2C49437-2397-436E-B511-E380BFE7100E} = {EA7DEA15-7EEA-4425-8460-F963A02FEA0C}
-		{354AA8B4-173F-4032-AFB8-C6A46F18B961} = {EA7DEA15-7EEA-4425-8460-F963A02FEA0C}
-		{B31D36D0-751C-4687-85A2-F7DC9331E215} = {EA7DEA15-7EEA-4425-8460-F963A02FEA0C}
+		{354AA8B4-173F-4032-AFB8-C6A46F18B961} = {53F91D64-DB5A-4EDD-AA90-CA136F738ACC}
+		{B31D36D0-751C-4687-85A2-F7DC9331E215} = {53F91D64-DB5A-4EDD-AA90-CA136F738ACC}
+		{EF736123-BC07-4B39-932E-9932ABB50DAD} = {EA7DEA15-7EEA-4425-8460-F963A02FEA0C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {21B6FA42-CBCC-404C-A999-A13DFA2C6F45}
